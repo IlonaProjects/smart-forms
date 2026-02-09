@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { Questionnaire } from 'fhir/r4';
 import BaseRenderer from '../../components/Renderer/BaseRenderer';
 
