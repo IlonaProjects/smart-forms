@@ -260,15 +260,17 @@ export function getCandidateExpressions(qItem: QuestionnaireItem): CandidateExpr
         'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression' &&
       extension.valueExpression &&
       // Only support FHIRPath and x-fhir-query for now
-      (extension.valueExpression.language === 'text/fhirpath' || 
-       extension.valueExpression.language === 'application/x-fhir-query')
+      (extension.valueExpression.language === 'text/fhirpath' ||
+        extension.valueExpression.language === 'application/x-fhir-query')
   );
 
   if (candidateExpressionExtensions && candidateExpressionExtensions.length > 0) {
-    return candidateExpressionExtensions.map((ext) => ({
-      expression: ext.valueExpression!,
-      result: undefined
-    }));
+    return candidateExpressionExtensions
+      .filter((ext) => ext.valueExpression)
+      .map((ext) => ({
+        expression: ext.valueExpression as Expression,
+        result: undefined
+      }));
   }
 
   return [];

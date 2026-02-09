@@ -27,8 +27,6 @@ jest.mock('../stores', () => ({
 
 import { useQuestionnaireStore } from '../stores';
 
-const mockUseQuestionnaireStore = useQuestionnaireStore as jest.MockedFunction<typeof useQuestionnaireStore>;
-
 describe('useCandidateExpression', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -36,7 +34,7 @@ describe('useCandidateExpression', () => {
 
   test('should return empty array when no candidate expressions exist', () => {
     const mockCandidateExpressions: CandidateExpressions = {};
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('test-linkId'));
@@ -56,7 +54,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('test-linkId'));
@@ -76,7 +74,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('test-linkId'));
@@ -96,7 +94,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('test-linkId'));
@@ -140,7 +138,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('condition-select'));
@@ -194,7 +192,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('medication-select'));
@@ -254,7 +252,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('observation-select'));
@@ -313,7 +311,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('practitioner-select'));
@@ -346,7 +344,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('primitive-select'));
@@ -395,7 +393,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('unknown-select'));
@@ -446,7 +444,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('combined-select'));
@@ -491,7 +489,7 @@ describe('useCandidateExpression', () => {
         }
       ]
     };
-    
+
     mockUseQuestionnaireStore.mockReturnValue(mockCandidateExpressions);
 
     const { result } = renderHook(() => useCandidateExpression('mixed-results'));

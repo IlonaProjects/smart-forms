@@ -113,7 +113,9 @@ describe('CandidateExpression Interfaces', () => {
 
       expect(expressions['combined-select']).toHaveLength(2);
       expect(expressions['combined-select'][0].expression.language).toBe('text/fhirpath');
-      expect(expressions['combined-select'][1].expression.language).toBe('application/x-fhir-query');
+      expect(expressions['combined-select'][1].expression.language).toBe(
+        'application/x-fhir-query'
+      );
     });
   });
 

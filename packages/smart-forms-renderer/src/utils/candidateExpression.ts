@@ -15,16 +15,11 @@
  * limitations under the License.
  */
 
-import {
-  cacheTerminologyResult,
-  handleFhirPathResult,
-  isExpressionCached
-} from './fhirpath';
+import { cacheTerminologyResult, handleFhirPathResult, isExpressionCached } from './fhirpath';
 import fhirpath from 'fhirpath';
 import fhirpath_r4_model from 'fhirpath/fhir-context/r4';
-import { client } from 'fhirclient';
 import { smartConfigStore } from '../stores/smartConfigStore';
-import type { CandidateExpressions, CandidateExpression } from '../interfaces/candidateExpression.interface';
+import type { CandidateExpressions } from '../interfaces/candidateExpression.interface';
 import type { Bundle } from 'fhir/r4';
 
 /**
@@ -37,12 +32,12 @@ function substituteXFhirQueryVariables(
 ): string {
   // Match patterns like {{%patient.id}} or {{%user.id}}
   const variablePattern = /\{\{%([\w.]+)\}\}/g;
-  
+
   return queryString.replace(variablePattern, (match, variablePath) => {
     // Split the path into parts (e.g., "patient.id" -> ["patient", "id"])
     const parts = variablePath.split('.');
     let value: any = fhirPathContext;
-    
+
     // Navigate through the path to get the value
     for (const part of parts) {
       value = value?.[part];
@@ -51,7 +46,7 @@ function substituteXFhirQueryVariables(
         return match; // Return original if not found
       }
     }
-    
+
     return String(value);
   });
 }
@@ -72,56 +67,58 @@ export async function evaluateCandidateExpressions(
 }> {
   let isUpdated = false;
   const updatedCandidateExpressions: CandidateExpressions = { ...candidateExpressions };
-  
+
   // Process each question's candidate expressions
   for (const linkId in candidateExpressions) {
     const candidateExpressionsForItem = candidateExpressions[linkId];
-    
+
     if (!candidateExpressionsForItem || candidateExpressionsForItem.length === 0) {
       continue;
     }
-    
+
     // Process each expression for this question
     for (const candidateExpression of candidateExpressionsForItem) {
       const { expression } = candidateExpression;
-      
+
       if (!expression.expression) {
         continue;
       }
-      
+
       // Check if we already evaluated this expression (performance optimization)
       if (isExpressionCached(expression.expression, fhirPathTerminologyCache)) {
         continue;
       }
-      
+
       try {
         if (expression.language === 'application/x-fhir-query') {
           // Handle FHIR query expressions - use the configured FHIR client (not terminology server)
           const queryString = expression.expression;
-          
+
           // Substitute variables like {{%patient.id}} with actual values
           const substitutedQuery = substituteXFhirQueryVariables(queryString, fhirPathContext);
-          
+
           // Get the configured FHIR client which has the data server URL and auth
           const fhirClient = smartConfigStore.getState().client;
-          
+
           if (!fhirClient) {
-            console.warn('CandidateExpression: No FHIR client configured for x-fhir-query. Use initialiseFhirClient() or SMART App Launch.');
+            console.warn(
+              'CandidateExpression: No FHIR client configured for x-fhir-query. Use initialiseFhirClient() or SMART App Launch.'
+            );
             candidateExpression.result = [];
             continue;
           }
-          
+
           // Execute the FHIR query using the configured client
           const queryResult: Bundle = await fhirClient.request(substitutedQuery);
-          
+
           // Extract resources from the Bundle
-          const resources = queryResult.entry?.map(entry => entry.resource).filter(Boolean) ?? [];
+          const resources = queryResult.entry?.map((entry) => entry.resource).filter(Boolean) ?? [];
           candidateExpression.result = resources;
-          
+
           isUpdated = true;
           continue;
         }
-        
+
         // Evaluate FHIRPath expressions as before
         const fhirPathResult = fhirpath.evaluate(
           {},
@@ -136,18 +133,17 @@ export async function evaluateCandidateExpressions(
             terminologyUrl: terminologyServerUrl
           }
         );
-        
+
         // Process and store the results
         const result = await handleFhirPathResult(fhirPathResult);
         candidateExpression.result = Array.isArray(result) ? result : [result];
-        
+
         // Cache the result to avoid re-evaluation
         if (fhirPathResult instanceof Promise) {
           cacheTerminologyResult(expression.expression, result, fhirPathTerminologyCache);
         }
-        
+
         isUpdated = true;
-        
       } catch (e) {
         // If expression fails, log error but don't crash
         console.warn(`CandidateExpression evaluation failed for ${expression.expression}:`, e);
@@ -155,7 +151,7 @@ export async function evaluateCandidateExpressions(
       }
     }
   }
-  
+
   return {
     isUpdated,
     updatedCandidateExpressions,

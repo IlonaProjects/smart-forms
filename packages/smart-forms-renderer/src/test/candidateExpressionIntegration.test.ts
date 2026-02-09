@@ -62,9 +62,13 @@ import {
 } from '../utils/fhirpath';
 import { client } from 'fhirclient';
 
-const mockUseQuestionnaireStore = useQuestionnaireStore as jest.MockedFunction<typeof useQuestionnaireStore>;
+const mockUseQuestionnaireStore = useQuestionnaireStore as jest.MockedFunction<
+  typeof useQuestionnaireStore
+>;
 const mockFhirpath = fhirpath as jest.MockedFunction<typeof fhirpath>;
-const mockHandleFhirPathResult = handleFhirPathResult as jest.MockedFunction<typeof handleFhirPathResult>;
+const mockHandleFhirPathResult = handleFhirPathResult as jest.MockedFunction<
+  typeof handleFhirPathResult
+>;
 const mockIsExpressionCached = isExpressionCached as jest.MockedFunction<typeof isExpressionCached>;
 const mockClient = client as jest.MockedFunction<typeof client>;
 
@@ -73,13 +77,13 @@ describe('Candidate Expression Integration Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Mock fhirclient request
     mockFhirClientRequest = jest.fn();
     mockClient.mockReturnValue({
       request: mockFhirClientRequest
     } as any);
-    
+
     // Default mock implementations
     mockIsExpressionCached.mockReturnValue(false);
     mockHandleFhirPathResult.mockImplementation(async (result) => result);
@@ -94,14 +98,14 @@ describe('Candidate Expression Integration Tests', () => {
     test('should extract, evaluate, and use candidate expressions for basic questionnaire', async () => {
       // Step 1: Extract candidate expressions from questionnaire
       const conditionSelectItem = qCandidateExpressionBasic.item?.find(
-        item => item.linkId === 'condition-select-fhirpath'
+        (item) => item.linkId === 'condition-select-fhirpath'
       );
       expect(conditionSelectItem).toBeDefined();
 
       const extractedExpressions = getCandidateExpressions(conditionSelectItem!);
       expect(extractedExpressions).toHaveLength(1);
       expect(extractedExpressions[0].expression.expression).toBe(
-        '%PatientConditions.entry.resource.where(resourceType=\'Condition\')'
+        "%PatientConditions.entry.resource.where(resourceType='Condition')"
       );
 
       // Step 2: Set up candidate expressions for evaluation
@@ -123,7 +127,9 @@ describe('Candidate Expression Integration Tests', () => {
       );
 
       expect(evaluationResult.isUpdated).toBe(true);
-      expect(evaluationResult.updatedCandidateExpressions['condition-select-fhirpath'][0].result).toEqual(mockResult);
+      expect(
+        evaluationResult.updatedCandidateExpressions['condition-select-fhirpath'][0].result
+      ).toEqual(mockResult);
 
       // Step 4: Use hook to get candidate options
       mockUseQuestionnaireStore.mockReturnValue(evaluationResult.updatedCandidateExpressions);
@@ -151,7 +157,7 @@ describe('Candidate Expression Integration Tests', () => {
     test('should handle multi-source candidate expressions', async () => {
       // Extract expressions from multi-source questionnaire
       const multiSourceItem = qCandidateExpressionMultiSource.item?.find(
-        item => item.linkId === 'combined-health-data'
+        (item) => item.linkId === 'combined-health-data'
       );
       expect(multiSourceItem).toBeDefined();
 
@@ -192,26 +198,28 @@ describe('Candidate Expression Integration Tests', () => {
 
       // Should combine results from both expressions
       expect(result.current.length).toBeGreaterThan(3); // Conditions + Observations
-      
+
       // Should have condition options
-      expect(result.current.some(option => option.valueCoding?.display === 'Diabetes mellitus')).toBe(true);
-      
+      expect(
+        result.current.some((option) => option.valueCoding?.display === 'Diabetes mellitus')
+      ).toBe(true);
+
       // Should have observation options (checking for observation-specific fields)
-      expect(result.current.some(option => 
-        option.valueCoding?.system === 'http://loinc.org'
-      )).toBe(true);
+      expect(
+        result.current.some((option) => option.valueCoding?.system === 'http://loinc.org')
+      ).toBe(true);
     });
 
     test('should handle complex questionnaire with multiple items', async () => {
       // Test primary concern item
       const primaryConcernItem = qCandidateExpressionComplex.item?.find(
-        item => item.linkId === 'primary-concern'
+        (item) => item.linkId === 'primary-concern'
       );
       const primaryConcernExpressions = getCandidateExpressions(primaryConcernItem!);
 
       // Test related medications item
       const medicationsItem = qCandidateExpressionComplex.item?.find(
-        item => item.linkId === 'related-medications'
+        (item) => item.linkId === 'related-medications'
       );
       const medicationExpressions = getCandidateExpressions(medicationsItem!);
 
@@ -222,8 +230,8 @@ describe('Candidate Expression Integration Tests', () => {
       };
 
       // Mock results
-      const mockConditionResult = mockConditions.filter(c => 
-        c.clinicalStatus?.coding?.[0]?.code === 'active'
+      const mockConditionResult = mockConditions.filter(
+        (c) => c.clinicalStatus?.coding?.[0]?.code === 'active'
       );
       const mockMedicationResult = createMockFhirPathResult('MedicationRequest');
 
@@ -248,25 +256,30 @@ describe('Candidate Expression Integration Tests', () => {
       // Test primary concern results
       mockUseQuestionnaireStore.mockReturnValue(evaluationResult.updatedCandidateExpressions);
       const { result: primaryResult } = renderHook(() => useCandidateExpression('primary-concern'));
-      
+
       expect(primaryResult.current.length).toBeGreaterThan(0);
-      expect(primaryResult.current.every(option => 
-        option.valueCoding || option.valueString
-      )).toBe(true);
+      expect(
+        primaryResult.current.every((option) => option.valueCoding || option.valueString)
+      ).toBe(true);
 
       // Test medication results
-      const { result: medicationResult } = renderHook(() => useCandidateExpression('related-medications'));
-      
+      const { result: medicationResult } = renderHook(() =>
+        useCandidateExpression('related-medications')
+      );
+
       expect(medicationResult.current.length).toBeGreaterThan(0);
-      expect(medicationResult.current.some(option =>
-        option.valueCoding?.display?.includes('Metformin') || 
-        option.valueString?.includes('Metformin')
-      )).toBe(true);
+      expect(
+        medicationResult.current.some(
+          (option) =>
+            option.valueCoding?.display?.includes('Metformin') ||
+            option.valueString?.includes('Metformin')
+        )
+      ).toBe(true);
     });
 
     test('should handle errors gracefully in end-to-end flow', async () => {
       const conditionSelectItem = qCandidateExpressionBasic.item?.find(
-        item => item.linkId === 'condition-select-fhirpath'
+        (item) => item.linkId === 'condition-select-fhirpath'
       );
       const extractedExpressions = getCandidateExpressions(conditionSelectItem!);
 
@@ -288,7 +301,9 @@ describe('Candidate Expression Integration Tests', () => {
       );
 
       expect(evaluationResult.isUpdated).toBe(true);
-      expect(evaluationResult.updatedCandidateExpressions['condition-select-fhirpath'][0].result).toEqual([]);
+      expect(
+        evaluationResult.updatedCandidateExpressions['condition-select-fhirpath'][0].result
+      ).toEqual([]);
       expect(consoleWarnSpy).toHaveBeenCalled();
 
       // Hook should handle empty results gracefully
@@ -302,7 +317,7 @@ describe('Candidate Expression Integration Tests', () => {
 
     test('should handle empty evaluation results', async () => {
       const conditionSelectItem = qCandidateExpressionBasic.item?.find(
-        item => item.linkId === 'condition-select-fhirpath'
+        (item) => item.linkId === 'condition-select-fhirpath'
       );
       const extractedExpressions = getCandidateExpressions(conditionSelectItem!);
 
@@ -322,7 +337,9 @@ describe('Candidate Expression Integration Tests', () => {
       );
 
       expect(evaluationResult.isUpdated).toBe(true);
-      expect(evaluationResult.updatedCandidateExpressions['condition-select-fhirpath'][0].result).toEqual([]);
+      expect(
+        evaluationResult.updatedCandidateExpressions['condition-select-fhirpath'][0].result
+      ).toEqual([]);
 
       // Hook should return empty array
       mockUseQuestionnaireStore.mockReturnValue(evaluationResult.updatedCandidateExpressions);
@@ -333,7 +350,7 @@ describe('Candidate Expression Integration Tests', () => {
 
     test('should handle x-fhir-query expressions end-to-end', async () => {
       const queryItem = qCandidateExpressionBasic.item?.find(
-        item => item.linkId === 'condition-select-query'
+        (item) => item.linkId === 'condition-select-query'
       );
       const extractedExpressions = getCandidateExpressions(queryItem!);
 
@@ -348,11 +365,12 @@ describe('Candidate Expression Integration Tests', () => {
         resourceType: 'Bundle',
         type: 'searchset',
         entry: mockConditions
-          .filter(c => 
-            c.clinicalStatus?.coding?.[0]?.code === 'active' &&
-            c.verificationStatus?.coding?.[0]?.code === 'confirmed'
+          .filter(
+            (c) =>
+              c.clinicalStatus?.coding?.[0]?.code === 'active' &&
+              c.verificationStatus?.coding?.[0]?.code === 'confirmed'
           )
-          .map(resource => ({ resource }))
+          .map((resource) => ({ resource }))
       };
 
       // Mock fhirclient request to return Bundle
@@ -366,7 +384,7 @@ describe('Candidate Expression Integration Tests', () => {
       );
 
       expect(evaluationResult.isUpdated).toBe(true);
-      
+
       // Verify fhirclient was called, NOT fhirpath.evaluate
       expect(mockClient).toHaveBeenCalledWith({ serverUrl: 'http://test-terminology.com' });
       expect(mockFhirClientRequest).toHaveBeenCalledWith({
@@ -375,20 +393,22 @@ describe('Candidate Expression Integration Tests', () => {
       expect(mockFhirpath.evaluate).not.toHaveBeenCalled();
 
       // Verify results were extracted from Bundle entries
-      expect(evaluationResult.updatedCandidateExpressions['condition-select-query'][0].result).toHaveLength(2);
+      expect(
+        evaluationResult.updatedCandidateExpressions['condition-select-query'][0].result
+      ).toHaveLength(2);
 
       mockUseQuestionnaireStore.mockReturnValue(evaluationResult.updatedCandidateExpressions);
       const { result } = renderHook(() => useCandidateExpression('condition-select-query'));
 
       expect(result.current.length).toBe(2); // Only diabetes and hypertension have confirmed status
-      expect(result.current.every(option => option.valueCoding)).toBe(true);
+      expect(result.current.every((option) => option.valueCoding)).toBe(true);
     });
   });
 
   describe('Performance and Caching', () => {
     test('should not re-evaluate cached expressions', async () => {
       const conditionSelectItem = qCandidateExpressionBasic.item?.find(
-        item => item.linkId === 'condition-select-fhirpath'
+        (item) => item.linkId === 'condition-select-fhirpath'
       );
       const extractedExpressions = getCandidateExpressions(conditionSelectItem!);
 
@@ -428,7 +448,7 @@ describe('Candidate Expression Integration Tests', () => {
 
     test('should handle mixed cached and uncached expressions', async () => {
       const multiSourceItem = qCandidateExpressionMultiSource.item?.find(
-        item => item.linkId === 'combined-health-data'
+        (item) => item.linkId === 'combined-health-data'
       );
       const extractedExpressions = getCandidateExpressions(multiSourceItem!);
 
@@ -438,7 +458,7 @@ describe('Candidate Expression Integration Tests', () => {
 
       // First expression cached, second not cached
       mockIsExpressionCached
-        .mockReturnValueOnce(true)  // First expression cached
+        .mockReturnValueOnce(true) // First expression cached
         .mockReturnValueOnce(false); // Second expression not cached
 
       mockFhirpath.evaluate.mockReturnValue(mockObservations);
@@ -459,8 +479,8 @@ describe('Candidate Expression Integration Tests', () => {
   describe('Hook State Management', () => {
     test('should update hook results when candidate expressions change', async () => {
       let currentCandidateExpressions: CandidateExpressions = {};
-      
-      mockUseQuestionnaireStore.mockImplementation((selector) => 
+
+      mockUseQuestionnaireStore.mockImplementation((selector) =>
         selector({ candidateExpressions: currentCandidateExpressions } as any)
       );
 

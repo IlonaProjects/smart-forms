@@ -17,7 +17,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react';
 import type { Questionnaire } from 'fhir/r4';
-import BaseRenderer, { type BaseRendererProps } from '../../components/BaseRenderer';
+import BaseRenderer from '../../components/Renderer/BaseRenderer';
 
 const meta: Meta<typeof BaseRenderer> = {
   title: 'Smart Forms 3.0.0-alpha/SDC Behaviors/Candidate Expressions',
@@ -99,7 +99,8 @@ const questionnaireWithCandidateExpressions: Questionnaire = {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'application/x-fhir-query',
-            expression: 'Practitioner?active=true&_profile=http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner'
+            expression:
+              'Practitioner?active=true&_profile=http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner'
           }
         }
       ],
@@ -112,13 +113,14 @@ const questionnaireWithCandidateExpressions: Questionnaire = {
     {
       linkId: 'observation-fhirpath',
       text: 'Recent vital signs (using FHIRPath)',
-      type: 'choice', 
+      type: 'choice',
       extension: [
         {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: '%resource.entry.where(resource.resourceType = \\'Observation\\' and resource.subject.reference = (\\'Patient/\\' + %patient.id) and resource.status = \\'final\\').resource'
+            expression:
+              "%resource.entry.where(resource.resourceType = 'Observation' and resource.subject.reference = ('Patient/' + %patient.id) and resource.status = 'final').resource"
           }
         }
       ],
@@ -179,7 +181,7 @@ const questionnaireCandidateExpressionsMultiple: Questionnaire = {
         {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
-            language: 'text/fhirpath', 
+            language: 'text/fhirpath',
             expression: "('Other condition not listed' | 'Prefer not to say')"
           }
         }
@@ -193,8 +195,8 @@ const questionnaireCandidateExpressionsMultiple: Questionnaire = {
           }
         },
         {
-          valencyCoding: {
-            system: 'http://snomed.info/sct', 
+          valueCoding: {
+            system: 'http://snomed.info/sct',
             code: '127013003',
             display: 'Emotional state finding'
           }
@@ -225,7 +227,9 @@ const mockBundle = {
         id: 'condition-1',
         subject: { reference: 'Patient/example-patient' },
         clinicalStatus: {
-          coding: [{ system: 'http://terminology.hl7.org/CodeSystem/condition-clinical', code: 'active' }]
+          coding: [
+            { system: 'http://terminology.hl7.org/CodeSystem/condition-clinical', code: 'active' }
+          ]
         },
         code: {
           coding: [
@@ -240,11 +244,13 @@ const mockBundle = {
     },
     {
       resource: {
-        resourceType: 'Condition', 
+        resourceType: 'Condition',
         id: 'condition-2',
         subject: { reference: 'Patient/example-patient' },
         clinicalStatus: {
-          coding: [{ system: 'http://terminology.hl7.org/CodeSystem/condition-clinical', code: 'active' }]
+          coding: [
+            { system: 'http://terminology.hl7.org/CodeSystem/condition-clinical', code: 'active' }
+          ]
         },
         code: {
           coding: [
@@ -305,7 +311,7 @@ const mockBundle = {
           coding: [
             {
               system: 'http://loinc.org',
-              code: '85354-9', 
+              code: '85354-9',
               display: 'Blood pressure panel with all children optional'
             }
           ]
@@ -326,7 +332,7 @@ export const BasicCandidateExpressions: Story = {
       { name: 'patient', resource: mockPatient },
       { name: 'resource', resource: mockBundle }
     ]
-  } as BaseRendererProps
+  }
 };
 
 export const MultipleCandidateExpressions: Story = {
@@ -336,5 +342,5 @@ export const MultipleCandidateExpressions: Story = {
       { name: 'patient', resource: mockPatient },
       { name: 'resource', resource: mockBundle }
     ]
-  } as BaseRendererProps
+  }
 };

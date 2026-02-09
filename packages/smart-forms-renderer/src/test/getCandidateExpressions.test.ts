@@ -60,7 +60,7 @@ describe('getCandidateExpressions', () => {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: 'Bundle.entry.resource.where(resourceType=\'Condition\')'
+            expression: "Bundle.entry.resource.where(resourceType='Condition')"
           }
         }
       ]
@@ -72,7 +72,7 @@ describe('getCandidateExpressions', () => {
     expect(result[0]).toEqual({
       expression: {
         language: 'text/fhirpath',
-        expression: 'Bundle.entry.resource.where(resourceType=\'Condition\')'
+        expression: "Bundle.entry.resource.where(resourceType='Condition')"
       },
       result: undefined
     });
@@ -116,7 +116,7 @@ describe('getCandidateExpressions', () => {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: 'Bundle.entry.resource.where(resourceType=\'Condition\')'
+            expression: "Bundle.entry.resource.where(resourceType='Condition')"
           }
         },
         {
@@ -140,9 +140,13 @@ describe('getCandidateExpressions', () => {
 
     expect(result).toHaveLength(3);
     expect(result[0].expression.language).toBe('text/fhirpath');
-    expect(result[0].expression.expression).toBe('Bundle.entry.resource.where(resourceType=\'Condition\')');
+    expect(result[0].expression.expression).toBe(
+      "Bundle.entry.resource.where(resourceType='Condition')"
+    );
     expect(result[1].expression.language).toBe('application/x-fhir-query');
-    expect(result[1].expression.expression).toBe('Observation?code=glucose&patient={{%patient.id}}');
+    expect(result[1].expression.expression).toBe(
+      'Observation?code=glucose&patient={{%patient.id}}'
+    );
     expect(result[2].expression.language).toBe('text/fhirpath');
     expect(result[2].expression.expression).toBe('%someVariable.entry.resource');
   });
@@ -218,7 +222,7 @@ describe('getCandidateExpressions', () => {
       extension: [
         {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
-          valueExpression: {}
+          valueExpression: { language: '', expression: '' }
         },
         {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
@@ -319,7 +323,8 @@ describe('getCandidateExpressions', () => {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: '%Bundle.entry.resource.where(resourceType=\'Condition\' and clinicalStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/condition-clinical\' and code=\'active\')).code.coding.where(system=\'http://snomed.info/sct\')'
+            expression:
+              "%Bundle.entry.resource.where(resourceType='Condition' and clinicalStatus.coding.where(system='http://terminology.hl7.org/CodeSystem/condition-clinical' and code='active')).code.coding.where(system='http://snomed.info/sct')"
           }
         }
       ]
@@ -329,9 +334,9 @@ describe('getCandidateExpressions', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].expression.language).toBe('text/fhirpath');
-    expect(result[0].expression.expression).toContain('where(resourceType=\'Condition\'');
+    expect(result[0].expression.expression).toContain("where(resourceType='Condition'");
     expect(result[0].expression.expression).toContain('clinicalStatus.coding');
-    expect(result[0].expression.expression).toContain('system=\'http://snomed.info/sct\'');
+    expect(result[0].expression.expression).toContain("system='http://snomed.info/sct'");
   });
 
   test('should handle complex x-fhir-query expressions', () => {
@@ -344,7 +349,8 @@ describe('getCandidateExpressions', () => {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'application/x-fhir-query',
-            expression: 'Condition?patient={{%patient.id}}&clinical-status=active&verification-status=confirmed&_sort=-onset-date&_count=50'
+            expression:
+              'Condition?patient={{%patient.id}}&clinical-status=active&verification-status=confirmed&_sort=-onset-date&_count=50'
           }
         }
       ]

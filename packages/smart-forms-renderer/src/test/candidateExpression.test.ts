@@ -17,7 +17,10 @@
 
 import { describe, expect, test, jest, beforeEach } from '@jest/globals';
 import { evaluateCandidateExpressions } from '../utils/candidateExpression';
-import type { CandidateExpressions, CandidateExpression } from '../interfaces/candidateExpression.interface';
+import type {
+  CandidateExpressions,
+  CandidateExpression
+} from '../interfaces/candidateExpression.interface';
 
 // Mock the fhirpath module
 jest.mock('fhirpath', () => ({
@@ -39,14 +42,18 @@ import {
 } from '../utils/fhirpath';
 
 const mockFhirpath = fhirpath as jest.MockedFunction<typeof fhirpath>;
-const mockCacheTerminologyResult = cacheTerminologyResult as jest.MockedFunction<typeof cacheTerminologyResult>;
-const mockHandleFhirPathResult = handleFhirPathResult as jest.MockedFunction<typeof handleFhirPathResult>;
+const mockCacheTerminologyResult = cacheTerminologyResult as jest.MockedFunction<
+  typeof cacheTerminologyResult
+>;
+const mockHandleFhirPathResult = handleFhirPathResult as jest.MockedFunction<
+  typeof handleFhirPathResult
+>;
 const mockIsExpressionCached = isExpressionCached as jest.MockedFunction<typeof isExpressionCached>;
 
 describe('evaluateCandidateExpressions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Default mocks
     mockIsExpressionCached.mockReturnValue(false);
     mockHandleFhirPathResult.mockImplementation(async (result) => result);
@@ -77,7 +84,7 @@ describe('evaluateCandidateExpressions', () => {
         {
           expression: {
             language: 'text/fhirpath',
-            expression: 'Bundle.entry.resource.where(resourceType=\'Condition\')'
+            expression: "Bundle.entry.resource.where(resourceType='Condition')"
           },
           result: undefined
         }
@@ -89,7 +96,9 @@ describe('evaluateCandidateExpressions', () => {
         resourceType: 'Condition',
         id: 'condition-1',
         code: {
-          coding: [{ system: 'http://snomed.info/sct', code: '73211009', display: 'Diabetes mellitus' }],
+          coding: [
+            { system: 'http://snomed.info/sct', code: '73211009', display: 'Diabetes mellitus' }
+          ],
           text: 'Diabetes mellitus'
         }
       },
@@ -108,7 +117,7 @@ describe('evaluateCandidateExpressions', () => {
 
     const fhirPathContext = {
       '%Bundle': {
-        entry: mockConditions.map(c => ({ resource: c }))
+        entry: mockConditions.map((c) => ({ resource: c }))
       }
     };
     const fhirPathTerminologyCache = {};
@@ -122,12 +131,14 @@ describe('evaluateCandidateExpressions', () => {
     );
 
     expect(result.isUpdated).toBe(true);
-    expect(result.updatedCandidateExpressions['condition-select'][0].result).toEqual(mockConditions);
+    expect(result.updatedCandidateExpressions['condition-select'][0].result).toEqual(
+      mockConditions
+    );
     expect(mockFhirpath.evaluate).toHaveBeenCalledWith(
       {},
       {
         base: 'QuestionnaireResponse',
-        expression: 'Bundle.entry.resource.where(resourceType=\'Condition\')'
+        expression: "Bundle.entry.resource.where(resourceType='Condition')"
       },
       fhirPathContext,
       expect.anything(),
@@ -179,7 +190,9 @@ describe('evaluateCandidateExpressions', () => {
     );
 
     expect(result.isUpdated).toBe(true);
-    expect(result.updatedCandidateExpressions['medication-select'][0].result).toEqual(mockMedications);
+    expect(result.updatedCandidateExpressions['medication-select'][0].result).toEqual(
+      mockMedications
+    );
   });
 
   test('should handle single result by converting to array', async () => {
@@ -302,14 +315,14 @@ describe('evaluateCandidateExpressions', () => {
         {
           expression: {
             language: 'text/fhirpath',
-            expression: 'Bundle.entry.resource.where(resourceType=\'Condition\')'
+            expression: "Bundle.entry.resource.where(resourceType='Condition')"
           },
           result: undefined
         },
         {
           expression: {
             language: 'text/fhirpath',
-            expression: 'Bundle.entry.resource.where(resourceType=\'Observation\')'
+            expression: "Bundle.entry.resource.where(resourceType='Observation')"
           },
           result: undefined
         }
@@ -319,10 +332,8 @@ describe('evaluateCandidateExpressions', () => {
     const mockConditions = [{ resourceType: 'Condition', code: { text: 'Diabetes' } }];
     const mockObservations = [{ resourceType: 'Observation', code: { text: 'Blood glucose' } }];
 
-    mockFhirpath.evaluate
-      .mockReturnValueOnce(mockConditions)
-      .mockReturnValueOnce(mockObservations);
-    
+    mockFhirpath.evaluate.mockReturnValueOnce(mockConditions).mockReturnValueOnce(mockObservations);
+
     mockHandleFhirPathResult
       .mockResolvedValueOnce(mockConditions)
       .mockResolvedValueOnce(mockObservations);

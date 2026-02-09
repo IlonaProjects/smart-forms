@@ -629,12 +629,12 @@ export const mockBundle: Bundle = {
   type: 'collection',
   entry: [
     { resource: mockPatient },
-    ...mockConditions.map(condition => ({ resource: condition })),
-    ...mockMedicationRequests.map(med => ({ resource: med })),
-    ...mockObservations.map(obs => ({ resource: obs })),
-    ...mockPractitioners.map(prac => ({ resource: prac })),
-    ...mockPractitionerRoles.map(role => ({ resource: role })),
-    ...mockEncounters.map(enc => ({ resource: enc }))
+    ...mockConditions.map((condition) => ({ resource: condition })),
+    ...mockMedicationRequests.map((med) => ({ resource: med })),
+    ...mockObservations.map((obs) => ({ resource: obs })),
+    ...mockPractitioners.map((prac) => ({ resource: prac })),
+    ...mockPractitionerRoles.map((role) => ({ resource: role })),
+    ...mockEncounters.map((enc) => ({ resource: enc }))
   ]
 };
 
@@ -642,41 +642,39 @@ export const mockBundle: Bundle = {
 export const mockFhirPathContext = {
   '%patient': mockPatient,
   '%PatientConditions': {
-    entry: mockConditions.map(condition => ({ resource: condition }))
+    entry: mockConditions.map((condition) => ({ resource: condition }))
   },
   '%AllConditions': {
-    entry: mockConditions.map(condition => ({ resource: condition }))
+    entry: mockConditions.map((condition) => ({ resource: condition }))
   },
   '%AllObservations': {
-    entry: mockObservations.map(obs => ({ resource: obs }))
+    entry: mockObservations.map((obs) => ({ resource: obs }))
   },
   '%VitalSigns': {
     entry: mockObservations
-      .filter(obs => obs.category?.[0]?.coding?.[0]?.code === 'vital-signs')
-      .map(obs => ({ resource: obs }))
+      .filter((obs) => obs.category?.[0]?.coding?.[0]?.code === 'vital-signs')
+      .map((obs) => ({ resource: obs }))
   },
   '%LabResults': {
     entry: mockObservations
-      .filter(obs => obs.category?.[0]?.coding?.[0]?.code === 'laboratory')
-      .map(obs => ({ resource: obs }))
+      .filter((obs) => obs.category?.[0]?.coding?.[0]?.code === 'laboratory')
+      .map((obs) => ({ resource: obs }))
   },
   '%RecentConditions': {
     entry: mockConditions
       .sort((a, b) => (b.onsetDateTime || '').localeCompare(a.onsetDateTime || ''))
       .slice(0, 10)
-      .map(condition => ({ resource: condition }))
+      .map((condition) => ({ resource: condition }))
   },
   '%ChronicConditions': {
     entry: mockConditions
-      .filter(condition =>
-        condition.category?.[0]?.coding?.[0]?.code === 'problem-list-item'
-      )
-      .map(condition => ({ resource: condition }))
+      .filter((condition) => condition.category?.[0]?.coding?.[0]?.code === 'problem-list-item')
+      .map((condition) => ({ resource: condition }))
   },
   '%DiabetesValueSet': mockValueSets[0],
   '%user': mockPractitioners[0],
   '%encounter': mockEncounters[0],
-  'Bundle': mockBundle
+  Bundle: mockBundle
 };
 
 // Helper function to create mock query results
@@ -716,9 +714,9 @@ export function createMockFhirPathResult(expression: string): any {
     return mockValueSets[0].expansion?.contains || [];
   }
   if (expression.includes('Bundle.entry.resource')) {
-    return mockBundle.entry?.map(entry => entry.resource) || [];
+    return mockBundle.entry?.map((entry) => entry.resource) || [];
   }
-  
+
   // Default empty result
   return [];
 }

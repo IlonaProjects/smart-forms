@@ -34,37 +34,34 @@ export interface CandidateOption {
 /**
  * React hook to get candidate options for a specific question
  * Following the pattern from useEnableWhen hook
- * 
+ *
  * @param linkId - The ID of the question we want candidates for
  * @returns Array of candidate options for this question
  */
 export function useCandidateExpression(linkId: string): CandidateOption[] {
   // Get the current state from the questionnaire store
   const candidateExpressions = useQuestionnaireStore.use.candidateExpressions();
-  
+
   // Get the candidate expressions for this specific question
   const candidateExpressionsForItem = candidateExpressions[linkId];
-  
+
   // If no candidate expressions, return empty array
   if (!candidateExpressionsForItem || candidateExpressionsForItem.length === 0) {
     return [];
   }
-  
+
   // Combine all candidate options from all expressions for this question
   const allCandidateOptions: CandidateOption[] = [];
-  
+
   for (const candidateExpression of candidateExpressionsForItem) {
     // If expression has been evaluated and has results
     if (candidateExpression.result && candidateExpression.result.length > 0) {
-      console.log('[useCandidateExpression] Raw results for', linkId, ':', candidateExpression.result);
       // Convert FHIR resources to answer options
       const options = convertResultsToCandidateOptions(candidateExpression.result);
-      console.log('[useCandidateExpression] Converted options for', linkId, ':', options);
       allCandidateOptions.push(...options);
     }
   }
-  
-  console.log('[useCandidateExpression] Final options for', linkId, ':', allCandidateOptions);
+
   return allCandidateOptions;
 }
 
@@ -74,7 +71,7 @@ export function useCandidateExpression(linkId: string): CandidateOption[] {
  */
 function convertResultsToCandidateOptions(results: any[]): CandidateOption[] {
   const candidateOptions: CandidateOption[] = [];
-  
+
   for (const result of results) {
     // Handle different types of FHIR resources
     if (result.resourceType) {
@@ -95,7 +92,7 @@ function convertResultsToCandidateOptions(results: any[]): CandidateOption[] {
     }
     // Could add more type handling as needed
   }
-  
+
   return candidateOptions;
 }
 
@@ -103,24 +100,17 @@ function convertResultsToCandidateOptions(results: any[]): CandidateOption[] {
  * Convert different FHIR resource types to display options
  */
 function convertResourceToCandidateOption(resource: any): CandidateOption | null {
-  console.log('[convertResourceToCandidateOption] Converting resource:', resource);
-  
   switch (resource.resourceType) {
     case 'Condition':
       // For conditions, use the condition code if available
-      console.log('[convertResourceToCandidateOption] Condition resource code:', resource.code);
       if (resource.code && resource.code.coding && resource.code.coding.length > 0) {
-        const option = { valueCoding: resource.code.coding[0] };
-        console.log('[convertResourceToCandidateOption] Condition -> Coding:', option);
-        return option;
+        return { valueCoding: resource.code.coding[0] };
       } else if (resource.code && resource.code.text) {
-        const option = { valueString: resource.code.text };
-        console.log('[convertResourceToCandidateOption] Condition -> Text:', option);
-        return option;
+        return { valueString: resource.code.text };
       }
       console.warn('[convertResourceToCandidateOption] Condition has no usable code');
       break;
-      
+
     case 'MedicationRequest':
       // For medications, try to get medication name
       if (resource.medicationCodeableConcept?.coding?.[0]) {
@@ -129,7 +119,7 @@ function convertResourceToCandidateOption(resource: any): CandidateOption | null
         return { valueString: resource.medicationCodeableConcept.text };
       }
       break;
-      
+
     case 'Observation':
       // For observations, could use the value or code
       if (resource.valueCodeableConcept?.coding?.[0]) {
@@ -138,7 +128,7 @@ function convertResourceToCandidateOption(resource: any): CandidateOption | null
         return { valueCoding: resource.code.coding[0] };
       }
       break;
-      
+
     case 'Practitioner':
       // For practitioners, use name
       if (resource.name && resource.name.length > 0) {
@@ -167,7 +157,7 @@ function convertResourceToCandidateOption(resource: any): CandidateOption | null
     case 'Location':
       // For locations, use location name and type
       if (resource.name) {
-        const display = resource.type?.coding?.[0]?.display 
+        const display = resource.type?.coding?.[0]?.display
           ? `${resource.name} (${resource.type.coding[0].display})`
           : resource.name;
         return { valueString: display };
@@ -269,7 +259,7 @@ function convertResourceToCandidateOption(resource: any): CandidateOption | null
         return { valueString: resource.type.text };
       }
       break;
-      
+
     // Could add more resource types as needed
     default:
       // For unknown types, try to find a display string
@@ -279,6 +269,6 @@ function convertResourceToCandidateOption(resource: any): CandidateOption | null
         return { valueString: resource.name };
       }
   }
-  
+
   return null; // Couldn't convert this resource
 }

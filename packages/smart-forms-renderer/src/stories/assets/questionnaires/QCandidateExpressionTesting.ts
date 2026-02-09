@@ -60,7 +60,7 @@ export const qCandidateExpressionBasic: Questionnaire = {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: '%PatientConditions.entry.resource.where(resourceType=\'Condition\')'
+            expression: "%PatientConditions.entry.resource.where(resourceType='Condition')"
           }
         }
       ]
@@ -74,7 +74,8 @@ export const qCandidateExpressionBasic: Questionnaire = {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'application/x-fhir-query',
-            expression: 'Condition?patient={{%patient.id}}&clinical-status=active&verification-status=confirmed'
+            expression:
+              'Condition?patient={{%patient.id}}&clinical-status=active&verification-status=confirmed'
           }
         }
       ]
@@ -125,7 +126,7 @@ export const qCandidateExpressionMultiSource: Questionnaire = {
       }
     },
     {
-      url: 'http://hl7.org/fhir/StructureDefinition/variable',  
+      url: 'http://hl7.org/fhir/StructureDefinition/variable',
       valueExpression: {
         name: 'AllObservations',
         language: 'application/x-fhir-query',
@@ -143,14 +144,14 @@ export const qCandidateExpressionMultiSource: Questionnaire = {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: '%AllConditions.entry.resource.where(resourceType=\'Condition\')'
+            expression: "%AllConditions.entry.resource.where(resourceType='Condition')"
           }
         },
         {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: '%AllObservations.entry.resource.where(resourceType=\'Observation\')'
+            expression: "%AllObservations.entry.resource.where(resourceType='Observation')"
           }
         }
       ]
@@ -247,8 +248,9 @@ export const qCandidateExpressionComplex: Questionnaire = {
       url: 'http://hl7.org/fhir/StructureDefinition/variable',
       valueExpression: {
         name: 'ChronicConditions',
-        language: 'application/x-fhir-query', 
-        expression: 'Condition?patient={{%patient.id}}&clinical-status=active&category=problem-list-item'
+        language: 'application/x-fhir-query',
+        expression:
+          'Condition?patient={{%patient.id}}&clinical-status=active&category=problem-list-item'
       }
     }
   ],
@@ -262,7 +264,8 @@ export const qCandidateExpressionComplex: Questionnaire = {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: '%RecentConditions.entry.resource.where(resourceType=\'Condition\' and clinicalStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/condition-clinical\' and code=\'active\'))'
+            expression:
+              "%RecentConditions.entry.resource.where(resourceType='Condition' and clinicalStatus.coding.where(system='http://terminology.hl7.org/CodeSystem/condition-clinical' and code='active'))"
           }
         }
       ]
@@ -277,7 +280,7 @@ export const qCandidateExpressionComplex: Questionnaire = {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: '%ChronicConditions.entry.resource.where(resourceType=\'Condition\')'
+            expression: "%ChronicConditions.entry.resource.where(resourceType='Condition')"
           }
         }
       ]
@@ -309,7 +312,8 @@ export const qCandidateExpressionValueSet: Questionnaire = {
       valueExpression: {
         name: 'DiabetesValueSet',
         language: 'application/x-fhir-query',
-        expression: 'ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/condition-code&filter=diabetes'
+        expression:
+          'ValueSet/$expand?url=http://hl7.org/fhir/ValueSet/condition-code&filter=diabetes'
       }
     }
   ],
@@ -323,7 +327,7 @@ export const qCandidateExpressionValueSet: Questionnaire = {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: '%DiabetesValueSet.expansion.contains.where(display contains \'diabetes\')'
+            expression: "%DiabetesValueSet.expansion.contains.where(display contains 'diabetes')"
           }
         }
       ]
@@ -337,7 +341,7 @@ export const qCandidateExpressionValueSet: Questionnaire = {
         {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
-            language: 'application/x-fhir-query', 
+            language: 'application/x-fhir-query',
             expression: 'ValueSet/$expand?url=http://snomed.info/sct&filter=symptom'
           }
         }
@@ -394,14 +398,15 @@ export const qCandidateExpressionObservation: Questionnaire = {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: '%VitalSigns.entry.resource.where(resourceType=\'Observation\' and status=\'final\')'
+            expression:
+              "%VitalSigns.entry.resource.where(resourceType='Observation' and status='final')"
           }
         }
       ]
     },
     {
       linkId: 'abnormal-lab-results',
-      type: 'choice', 
+      type: 'choice',
       text: 'Select abnormal lab results',
       repeats: true,
       extension: [
@@ -409,7 +414,8 @@ export const qCandidateExpressionObservation: Questionnaire = {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
             language: 'text/fhirpath',
-            expression: '%LabResults.entry.resource.where(resourceType=\'Observation\' and status=\'final\' and interpretation.coding.where(system=\'http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation\' and (code=\'H\' or code=\'L\' or code=\'A\')))'
+            expression:
+              "%LabResults.entry.resource.where(resourceType='Observation' and status='final' and interpretation.coding.where(system='http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation' and (code='H' or code='L' or code='A')))"
           }
         }
       ]
@@ -446,7 +452,7 @@ export const qCandidateExpressionEncounter: Questionnaire = {
             system: 'http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext',
             code: 'encounter'
           }
-        },  
+        },
         {
           url: 'type',
           valueCode: 'Encounter'
@@ -514,8 +520,8 @@ export const qCandidateExpressionErrorHandling: Questionnaire = {
         {
           url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
           valueExpression: {
-            language: 'text/fhirpath', 
-            expression: 'Bundle.entry.resource.where(resourceType=\'NonexistentResource\')'
+            language: 'text/fhirpath',
+            expression: "Bundle.entry.resource.where(resourceType='NonexistentResource')"
           }
         }
       ]
