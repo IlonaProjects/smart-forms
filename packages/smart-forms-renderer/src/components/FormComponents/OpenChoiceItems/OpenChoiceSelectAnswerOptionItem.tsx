@@ -20,6 +20,7 @@ import type { QuestionnaireItemAnswerOption } from 'fhir/r4';
 import useReadOnly from '../../../hooks/useReadOnly';
 import useRenderingExtensions from '../../../hooks/useRenderingExtensions';
 import useValidationFeedback from '../../../hooks/useValidationFeedback';
+import { useCandidateExpression, type CandidateOption } from '../../../hooks/useCandidateExpression';
 import type { BaseItemProps } from '../../../interfaces/renderProps.interface';
 import { useQuestionnaireStore } from '../../../stores';
 import { createEmptyQrItem, getQRItemId } from '../../../utils/qrItem';
@@ -51,10 +52,33 @@ function OpenChoiceSelectAnswerOptionItem(props: BaseItemProps) {
   const { displayInstructions } = useRenderingExtensions(qItem);
   const instructionsId = getInstructionsId(qItem, displayInstructions, !!feedback);
 
+  // Get candidate expressions for this question
+  const candidateOptions = useCandidateExpression(qItem.linkId);
+
   // Init input value
   const answerKey = getQRItemId(qrItem?.answer?.[0]?.id);
-  const answerOptions = qItem.answerOption;
-  if (!answerOptions) return null;
+  const answerOptions = qItem.answerOption ?? [];
+
+  // Merge static answerOptions with dynamic candidate options
+  const convertedCandidateOptions: QuestionnaireItemAnswerOption[] = candidateOptions.map(option => {
+    if (option.valueCoding) {
+      return { valueCoding: option.valueCoding };
+    } else if (option.valueString) {
+      return { valueString: option.valueString };
+    } else if (option.valueInteger) {
+      return { valueInteger: option.valueInteger };
+    } else if (option.valueDate) {
+      return { valueDate: option.valueDate };
+    } else if (option.valueBoolean) {
+      return { valueBoolean: option.valueBoolean };
+    } else if (option.valueDecimal) {
+      return { valueDecimal: option.valueDecimal };
+    }
+    return { valueString: 'Unknown' };
+  });
+  
+  // Combine static and dynamic options
+  const allOptions = [...answerOptions, ...convertedCandidateOptions];
 
   const qrOpenChoice = qrItem ?? createEmptyQrItem(qItem, answerKey);
   let valueSelect: QuestionnaireItemAnswerOption | string | null = null;
@@ -109,7 +133,7 @@ function OpenChoiceSelectAnswerOptionItem(props: BaseItemProps) {
     return (
       <OpenChoiceSelectAnswerOptionField
         qItem={qItem}
-        options={answerOptions}
+        options={allOptions}
         valueSelect={valueSelect}
         feedback={feedback}
         readOnly={readOnly}
@@ -135,7 +159,7 @@ function OpenChoiceSelectAnswerOptionItem(props: BaseItemProps) {
         fieldChildren={
           <OpenChoiceSelectAnswerOptionField
             qItem={qItem}
-            options={answerOptions}
+            options={allOptions}
             valueSelect={valueSelect}
             feedback={feedback}
             readOnly={readOnly}

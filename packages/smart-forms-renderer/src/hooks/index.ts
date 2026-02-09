@@ -6,6 +6,8 @@ export { default as useRenderingExtensions } from './useRenderingExtensions';
 export { default as useValidationFeedback } from './useValidationFeedback';
 export { default as useValueSetCodings } from './useValueSetCodings';
 
+export { useCandidateExpression } from './useCandidateExpression';
+
 // CalculatedExpression and cqf-expression hooks
 export { default as useDisplayCqfAndCalculatedExpression } from './useDisplayCqfAndCalculatedExpression';
 

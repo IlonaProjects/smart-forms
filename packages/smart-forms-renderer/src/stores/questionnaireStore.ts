@@ -28,6 +28,7 @@ import type { QItemOverrideComponentProps, SdcUiOverrideComponentProps } from '.
 import type { AnswerExpression } from '../interfaces/answerExpression.interface';
 import type { AnswerOptionsToggleExpression } from '../interfaces/answerOptionsToggleExpression.interface';
 import type { CalculatedExpression } from '../interfaces/calculatedExpression.interface';
+import type { CandidateExpressions } from '../interfaces/candidateExpression.interface';
 import type { EnableWhenExpressions, EnableWhenItems } from '../interfaces/enableWhen.interface';
 import type { InitialExpression } from '../interfaces/initialExpression.interface';
 import type { Pages } from '../interfaces/page.interface';
@@ -121,6 +122,7 @@ export interface QuestionnaireStoreType {
   launchContexts: Record<string, LaunchContext>;
   initialExpressions: Record<string, InitialExpression>;
   answerExpressions: Record<string, AnswerExpression>;
+  candidateExpressions: CandidateExpressions;
   calculatedExpressions: Record<string, CalculatedExpression[]>;
   targetConstraints: Record<string, TargetConstraint>;
   targetConstraintLinkIds: Record<string, string[]>;
@@ -197,6 +199,7 @@ export const questionnaireStore = createStore<QuestionnaireStoreType>()((set, ge
   answerOptionsToggleExpressions: {},
   calculatedExpressions: {},
   initialExpressions: {},
+  candidateExpressions: {},
   enableWhenExpressions: { singleExpressions: {}, repeatExpressions: {} },
   answerExpressions: {},
   enableWhenItems: { singleItems: {}, repeatItems: {} },
@@ -285,6 +288,7 @@ export const questionnaireStore = createStore<QuestionnaireStoreType>()((set, ge
       calculatedExpressions: initialCalculatedExpressions,
       initialExpressions: questionnaireModel.initialExpressions,
       answerExpressions: questionnaireModel.answerExpressions,
+      candidateExpressions: questionnaireModel.candidateExpressions,
       processedValueSets: initialProcessedValueSets,
       cachedValueSetCodings: questionnaireModel.cachedValueSetCodings,
       fhirPathContext: finalFhirPathContext,
@@ -315,6 +319,7 @@ export const questionnaireStore = createStore<QuestionnaireStoreType>()((set, ge
       calculatedExpressions: {},
       initialExpressions: {},
       answerExpressions: {},
+      candidateExpressions: {},
       processedValueSets: {},
       fhirPathContext: {},
       fhirPathTerminologyCache: {},
@@ -454,6 +459,7 @@ export const questionnaireStore = createStore<QuestionnaireStoreType>()((set, ge
       answerOptionsToggleExpressions,
       enableWhenItems,
       enableWhenExpressions,
+      candidateExpressions,
       processedValueSets,
       calculatedExpressions,
       fhirPathContext,
@@ -473,6 +479,7 @@ export const questionnaireStore = createStore<QuestionnaireStoreType>()((set, ge
         targetConstraints?: Record<string, TargetConstraint>;
         enableWhenExpressions?: EnableWhenExpressions;
         answerOptionsToggleExpressions?: Record<string, AnswerOptionsToggleExpression[]>;
+        candidateExpressions?: CandidateExpressions;
         processedValueSets?: Record<string, ProcessedValueSet>;
         enableWhenItems?: EnableWhenItems;
         enableWhenLinkedQuestions?: Record<string, string[]>;
@@ -491,6 +498,9 @@ export const questionnaireStore = createStore<QuestionnaireStoreType>()((set, ge
         }),
         ...(otherExpressions?.answerOptionsToggleExpressions && {
           answerOptionsToggleExpressions: otherExpressions.answerOptionsToggleExpressions
+        }),
+        ...(otherExpressions?.candidateExpressions && {
+          candidateExpressions: otherExpressions.candidateExpressions
         }),
         ...(otherExpressions?.processedValueSets && {
           processedValueSets: otherExpressions.processedValueSets
@@ -538,6 +548,7 @@ export const questionnaireStore = createStore<QuestionnaireStoreType>()((set, ge
       enableWhenExpressionsUpdate,
       answerOptionsToggleExpressionsUpdate,
       processedValueSetsUpdate,
+      candidateExpressionsUpdate,
       computedQRItemUpdates
     } = await evaluateOtherExpressions(
       lastUpdatedResponse,
@@ -549,6 +560,7 @@ export const questionnaireStore = createStore<QuestionnaireStoreType>()((set, ge
       enableWhenExpressions,
       answerOptionsToggleExpressions,
       processedValueSets,
+      candidateExpressions,
       defaultTerminologyServerUrl
     );
 
@@ -583,6 +595,7 @@ export const questionnaireStore = createStore<QuestionnaireStoreType>()((set, ge
       targetConstraints: Record<string, TargetConstraint>;
       enableWhenExpressions: EnableWhenExpressions;
       answerOptionsToggleExpressions: Record<string, AnswerOptionsToggleExpression[]>;
+      candidateExpressions: CandidateExpressions;
       processedValueSets: Record<string, ProcessedValueSet>;
       enableWhenItems: EnableWhenItems;
       enableWhenLinkedQuestions: Record<string, string[]>;
@@ -596,6 +609,9 @@ export const questionnaireStore = createStore<QuestionnaireStoreType>()((set, ge
     if (answerOptionsToggleExpressionsUpdate.isUpdated) {
       otherExpressionsToUpdate.answerOptionsToggleExpressions =
         answerOptionsToggleExpressionsUpdate.value;
+    }
+    if (candidateExpressionsUpdate.isUpdated) {
+      otherExpressionsToUpdate.candidateExpressions = candidateExpressionsUpdate.value;
     }
     if (processedValueSetsUpdate.isUpdated) {
       otherExpressionsToUpdate.processedValueSets = processedValueSetsUpdate.value;

@@ -204,6 +204,19 @@ export function сqfExpressionFactory(text: string) {
   };
 }
 
+export function candidateExpressionExtFactory(
+  expression: string,
+  language: 'text/fhirpath' | 'application/x-fhir-query' = 'text/fhirpath'
+): Extension {
+  return {
+    url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
+    valueExpression: {
+      language: language,
+      expression: expression
+    }
+  };
+}
+
 export const ucumSystem = 'http://unitsofmeasure.org';
 
 /** Parses strings like `11:00 am` for MUI desktop time picker interactions */

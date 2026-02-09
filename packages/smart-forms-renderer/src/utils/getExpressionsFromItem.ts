@@ -20,6 +20,7 @@ import type { CalculatedExpression } from '../interfaces/calculatedExpression.in
 import type { AnswerOptionsToggleExpression } from '../interfaces/answerOptionsToggleExpression.interface';
 import { type RestrictedAnswerOption } from '../interfaces/answerOptionsToggleExpression.interface';
 import { optionIsAnswerOptionsToggleExpressionOption } from './questionnaireStoreUtils/extractAnswerOptionsToggleExpressions';
+import type { CandidateExpression } from '../interfaces/candidateExpression.interface';
 
 /**
  * Get enableWhenExpression.valueExpression if its present in item
@@ -245,4 +246,30 @@ export function getAnswerOptionsToggleExpressions(
   }
 
   return null;
+}
+
+/**
+ * Get candidateExpressions if present in item
+ *
+ * @author Sean Fong
+ */
+export function getCandidateExpressions(qItem: QuestionnaireItem): CandidateExpression[] {
+  const candidateExpressionExtensions = qItem.extension?.filter(
+    (extension: Extension) =>
+      extension.url ===
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression' &&
+      extension.valueExpression &&
+      // Only support FHIRPath and x-fhir-query for now
+      (extension.valueExpression.language === 'text/fhirpath' || 
+       extension.valueExpression.language === 'application/x-fhir-query')
+  );
+
+  if (candidateExpressionExtensions && candidateExpressionExtensions.length > 0) {
+    return candidateExpressionExtensions.map((ext) => ({
+      expression: ext.valueExpression!,
+      result: undefined
+    }));
+  }
+
+  return [];
 }

@@ -21,6 +21,7 @@ import type { Variables } from './variables.interface';
 import type { LaunchContext } from './populate.interface';
 import type { EnableWhenExpressions, EnableWhenItems } from './enableWhen.interface';
 import type { CalculatedExpression } from './calculatedExpression.interface';
+import type { CandidateExpressions } from './candidateExpression.interface';
 import type { AnswerExpression } from './answerExpression.interface';
 import type { Coding, QuestionnaireItem, QuestionnaireItemAnswerOption } from 'fhir/r4';
 import type { InitialExpression } from './initialExpression.interface';
@@ -41,6 +42,7 @@ export interface QuestionnaireModel {
   calculatedExpressions: Record<string, CalculatedExpression[]>;
   initialExpressions: Record<string, InitialExpression>;
   answerExpressions: Record<string, AnswerExpression>;
+  candidateExpressions: CandidateExpressions;
   answerOptions: Record<string, QuestionnaireItemAnswerOption[]>;
   answerOptionsToggleExpressions: Record<string, AnswerOptionsToggleExpression[]>;
   processedValueSets: Record<string, ProcessedValueSet>;

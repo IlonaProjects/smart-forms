@@ -15,17 +15,32 @@
  * limitations under the License.
  */
 
-export type { Tab, Tabs } from './tab.interface';
-export type { Variables, VariableXFhirQuery } from './variables.interface';
-export type { LaunchContext } from './populate.interface';
-export type { EnableWhenItems, EnableWhenExpressions } from './enableWhen.interface';
-export type { CalculatedExpression } from './calculatedExpression.interface';
-export type {
-  CandidateExpression,
-  CandidateExpressions,
-  CandidateOption
-} from './candidateExpression.interface';
-export type {
-  QItemOverrideComponentProps,
-  SdcUiOverrideComponentProps
-} from './overrideComponent.interface';
+import type { Expression, Coding } from 'fhir/r4';
+
+/**
+ * A single candidate expression on a questionnaire item
+ */
+export interface CandidateExpression {
+  expression: Expression;
+  result?: any[];
+}
+
+/**
+ * Collection of candidate expressions organized by question linkId
+ */
+export interface CandidateExpressions {
+  [linkId: string]: CandidateExpression[];
+}
+
+/**
+ * A candidate option that can be selected as an answer
+ * Supports the main FHIR answer types
+ */
+export interface CandidateOption {
+  valueCoding?: Coding;
+  valueString?: string;
+  valueInteger?: number;
+  valueDate?: string;
+  valueBoolean?: boolean;
+  valueDecimal?: number;
+}
