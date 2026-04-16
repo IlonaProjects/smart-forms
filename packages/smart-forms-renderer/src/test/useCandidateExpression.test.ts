@@ -27,6 +27,8 @@ jest.mock('../stores', () => ({
 
 import { useQuestionnaireStore } from '../stores';
 
+const mockUseQuestionnaireStore = useQuestionnaireStore as unknown as jest.Mock;
+
 describe('useCandidateExpression', () => {
   beforeEach(() => {
     jest.clearAllMocks();

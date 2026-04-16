@@ -41,7 +41,7 @@ import {
   isExpressionCached
 } from '../utils/fhirpath';
 
-const mockFhirpath = fhirpath as jest.MockedFunction<typeof fhirpath>;
+const mockFhirpath = fhirpath as { evaluate: jest.Mock };
 const mockCacheTerminologyResult = cacheTerminologyResult as jest.MockedFunction<
   typeof cacheTerminologyResult
 >;
@@ -211,7 +211,7 @@ describe('evaluateCandidateExpressions', () => {
     const singleResult = { family: 'Doe', given: ['John'] };
 
     mockFhirpath.evaluate.mockReturnValue(singleResult);
-    mockHandleFhirPathResult.mockResolvedValue(singleResult);
+    mockHandleFhirPathResult.mockResolvedValue(singleResult as any);
 
     const result = await evaluateCandidateExpressions(
       {},
@@ -263,7 +263,7 @@ describe('evaluateCandidateExpressions', () => {
       ]
     };
 
-    const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     mockFhirpath.evaluate.mockImplementation(() => {
       throw new Error('Invalid expression');
     });

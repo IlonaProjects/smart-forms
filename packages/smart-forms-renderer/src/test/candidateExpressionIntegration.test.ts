@@ -62,10 +62,8 @@ import {
 } from '../utils/fhirpath';
 import { client } from 'fhirclient';
 
-const mockUseQuestionnaireStore = useQuestionnaireStore as jest.MockedFunction<
-  typeof useQuestionnaireStore
->;
-const mockFhirpath = fhirpath as jest.MockedFunction<typeof fhirpath>;
+const mockUseQuestionnaireStore = useQuestionnaireStore as unknown as jest.Mock;
+const mockFhirpath = fhirpath as { evaluate: jest.Mock };
 const mockHandleFhirPathResult = handleFhirPathResult as jest.MockedFunction<
   typeof handleFhirPathResult
 >;
@@ -288,7 +286,7 @@ describe('Candidate Expression Integration Tests', () => {
       };
 
       // Mock evaluation failure
-      const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       mockFhirpath.evaluate.mockImplementation(() => {
         throw new Error('FHIRPath evaluation error');
       });
@@ -374,7 +372,7 @@ describe('Candidate Expression Integration Tests', () => {
       };
 
       // Mock fhirclient request to return Bundle
-      mockFhirClientRequest.mockResolvedValue(mockQueryResult);
+      mockFhirClientRequest.mockResolvedValue(mockQueryResult as any);
 
       const evaluationResult = await evaluateCandidateExpressions(
         mockFhirPathContext,
