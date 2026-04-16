@@ -253,7 +253,6 @@ async function setTimeViaMuiDesktopPicker(
 ) {
   const { hour12, minute, meridiem } = parse12hDisplayTime(displayTime);
   const minuteVal = parseInt(minute, 10);
-  // MUI enUS: hoursClockNumberText → "11 hours", minutesClockNumberText → "0 minutes"
   const hourOptionName = new RegExp(`^${hour12}\\s+hours$`, 'i');
   const minuteOptionName = new RegExp(`^${minuteVal}\\s+minutes$`, 'i');
 
@@ -280,7 +279,6 @@ async function setTimeViaMuiDesktopPicker(
       throw new Error('Expected multi-section time lists');
     }
 
-    // Match by aria-label anywhere in the clock (column order varies with RTL / MUI version).
     await clickMultiSectionClockOption(multiRoot, hourOptionName);
     await clickMultiSectionClockOption(multiRoot, minuteOptionName);
 
