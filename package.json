@@ -1,7 +1,7 @@
 {
   "name": "smart-forms",
   "scripts": {
-    "prepare": "npm run build:smart-forms-renderer",
+    "prepare": "npm run build-all-deps-first-run",
     "lint": "eslint -c eslint.config.mjs .",
     "lint-fix": "eslint -c eslint.config.mjs --fix .",
     "lint-fix-errors": "eslint -c eslint.config.mjs --fix --quiet .",
