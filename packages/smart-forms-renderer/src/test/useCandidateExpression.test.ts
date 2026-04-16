@@ -22,12 +22,17 @@ import type { CandidateExpressions } from '../interfaces/candidateExpression.int
 
 // Mock the questionnaire store
 jest.mock('../stores', () => ({
-  useQuestionnaireStore: jest.fn()
+  useQuestionnaireStore: {
+    use: {
+      candidateExpressions: jest.fn()
+    }
+  }
 }));
 
 import { useQuestionnaireStore } from '../stores';
 
-const mockUseQuestionnaireStore = useQuestionnaireStore as unknown as jest.Mock;
+const mockUseQuestionnaireStore = useQuestionnaireStore.use
+  .candidateExpressions as unknown as jest.Mock;
 
 describe('useCandidateExpression', () => {
   beforeEach(() => {

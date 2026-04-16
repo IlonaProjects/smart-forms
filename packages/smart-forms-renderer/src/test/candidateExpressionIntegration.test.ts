@@ -531,7 +531,9 @@ describe('Candidate Expression Integration Tests', () => {
       rerender();
 
       expect(result.current).toHaveLength(1);
-      expect(result.current[0].valueCoding?.display).toBe(mockConditions[0].code?.coding?.[0]?.display);
+      expect(result.current[0].valueCoding?.display).toBe(
+        mockConditions[0].code?.coding?.[0]?.display
+      );
 
       // Update with different results
       act(() => {

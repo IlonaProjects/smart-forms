@@ -34,6 +34,13 @@ jest.mock('../utils/fhirpath', () => ({
   isExpressionCached: jest.fn()
 }));
 
+// Mock smartConfigStore for x-fhir-query tests
+jest.mock('../stores/smartConfigStore', () => ({
+  smartConfigStore: {
+    getState: jest.fn()
+  }
+}));
+
 import fhirpath from 'fhirpath';
 import {
   cacheTerminologyResult,
@@ -41,7 +48,7 @@ import {
   isExpressionCached
 } from '../utils/fhirpath';
 
-const mockFhirpath = fhirpath as { evaluate: jest.Mock };
+const mockFhirpath = fhirpath as unknown as { evaluate: jest.Mock };
 const mockCacheTerminologyResult = cacheTerminologyResult as jest.MockedFunction<
   typeof cacheTerminologyResult
 >;
@@ -49,6 +56,9 @@ const mockHandleFhirPathResult = handleFhirPathResult as jest.MockedFunction<
   typeof handleFhirPathResult
 >;
 const mockIsExpressionCached = isExpressionCached as jest.MockedFunction<typeof isExpressionCached>;
+
+import { smartConfigStore } from '../stores/smartConfigStore';
+const mockSmartConfigGetState = smartConfigStore.getState as jest.Mock;
 
 describe('evaluateCandidateExpressions', () => {
   beforeEach(() => {
@@ -173,8 +183,10 @@ describe('evaluateCandidateExpressions', () => {
       }
     ];
 
-    mockFhirpath.evaluate.mockReturnValue(mockMedications);
-    mockHandleFhirPathResult.mockResolvedValue(mockMedications);
+    const mockRequestFn = (jest.fn() as jest.Mock<any>).mockResolvedValue({
+      entry: mockMedications.map((med) => ({ resource: med }))
+    });
+    mockSmartConfigGetState.mockReturnValue({ client: { request: mockRequestFn } });
 
     const fhirPathContext = {
       '%patient': { id: 'patient-123' }
@@ -275,7 +287,7 @@ describe('evaluateCandidateExpressions', () => {
       'http://test-terminology.com'
     );
 
-    expect(result.isUpdated).toBe(true);
+    expect(result.isUpdated).toBe(false);
     expect(result.updatedCandidateExpressions['error-expression'][0].result).toEqual([]);
     expect(consoleWarnSpy).toHaveBeenCalledWith(
       'CandidateExpression evaluation failed for invalid.fhirpath.expression:',
