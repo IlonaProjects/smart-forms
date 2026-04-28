@@ -23,8 +23,11 @@ COPY packages/sdc-template-extract/package*.json ./packages/sdc-template-extract
 COPY packages/smart-forms-renderer/package*.json ./packages/smart-forms-renderer/
 COPY apps/smart-forms-app/package*.json ./apps/smart-forms-app/
 
-# Install all workspace dependencies from the root
-RUN npm install
+# TODO: Remove --ignore-scripts once the upstream PR is accepted and merged.
+# We are currently linking this branch to an external GitLab project via SSH to consume changes before the PR lands.
+# npm install triggers workspace lifecycle build scripts (e.g. sdc-assemble compile) before source files are
+# available in this Docker layer. --ignore-scripts prevents that; packages are built explicitly in the steps below.
+RUN npm install --ignore-scripts
 
 # Copy source files for all packages and the app
 COPY packages/sdc-assemble/ ./packages/sdc-assemble/
