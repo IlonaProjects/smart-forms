@@ -23,10 +23,17 @@ COPY packages/sdc-template-extract/package*.json ./packages/sdc-template-extract
 COPY packages/smart-forms-renderer/package*.json ./packages/smart-forms-renderer/
 COPY apps/smart-forms-app/package*.json ./apps/smart-forms-app/
 
-# TODO: Remove --ignore-scripts once the upstream PR is accepted and merged.
-# We are currently linking this branch to an external GitLab project via SSH to consume changes before the PR lands.
-# npm install triggers workspace lifecycle build scripts (e.g. sdc-assemble compile) before source files are
-# available in this Docker layer. --ignore-scripts prevents that; packages are built explicitly in the steps below.
+# npm 10 on Node 20 still runs `prepare` scripts for local workspace packages even with --ignore-scripts,
+# because they are symlinked rather than downloaded. Strip prepare scripts from workspace package.json files
+# before install to prevent build attempts before source files are copied. Packages are built explicitly below.
+RUN node -e "\
+  ['packages/sdc-assemble','packages/sdc-populate','packages/sdc-template-extract','packages/smart-forms-renderer']\
+  .forEach(p => {\
+    const f = p + '/package.json';\
+    const pkg = JSON.parse(require('fs').readFileSync(f));\
+    delete pkg.scripts.prepare;\
+    require('fs').writeFileSync(f, JSON.stringify(pkg, null, 2));\
+  });"
 RUN npm install --ignore-scripts
 
 # Copy source files for all packages and the app
