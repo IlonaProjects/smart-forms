@@ -20,9 +20,11 @@ import fhirpath_r4_model from 'fhirpath/fhir-context/r4';
 import type { Expression, QuestionnaireResponse, QuestionnaireResponseItem } from 'fhir/r4';
 import type { EnableWhenExpressions } from '../interfaces/enableWhen.interface';
 import { evaluateEnableWhenExpressions } from './enableWhenExpression';
+import { evaluateCandidateExpressions } from './candidateExpression';
 import { evaluateTargetConstraints } from './targetConstraint';
 import type { TargetConstraint } from '../interfaces/targetConstraint.interface';
 import type { Variables, VariableXFhirQuery } from '../interfaces';
+import type { CandidateExpressions } from '../interfaces/candidateExpression.interface';
 import { evaluateDynamicValueSets } from './parameterisedValueSets';
 import type { ComputedQRItemUpdates } from '../interfaces/computedUpdates.interface';
 import type { AnswerOptionsToggleExpression } from '../interfaces/answerOptionsToggleExpression.interface';
@@ -43,6 +45,7 @@ export async function evaluateOtherExpressions(
   enableWhenExpressions: EnableWhenExpressions,
   answerOptionsToggleExpressions: Record<string, AnswerOptionsToggleExpression[]>,
   processedValueSets: Record<string, any>,
+  candidateExpressions: CandidateExpressions,
   terminologyServerUrl: string
 ): Promise<{
   updatedFhirPathContext: Record<string, any>;
@@ -53,6 +56,7 @@ export async function evaluateOtherExpressions(
     Record<string, AnswerOptionsToggleExpression[]>
   >;
   processedValueSetsUpdate: ExpressionUpdate<Record<string, any>>;
+  candidateExpressionsUpdate: ExpressionUpdate<CandidateExpressions>;
   computedQRItemUpdates: ComputedQRItemUpdates;
 }> {
   // Performance check: Check if there are any expressions to be updated before proceeding with eval logic
@@ -60,7 +64,8 @@ export async function evaluateOtherExpressions(
     Object.keys(targetConstraints).length === 0 &&
     Object.keys(enableWhenExpressions).length === 0 &&
     Object.keys(answerOptionsToggleExpressions).length === 0 &&
-    Object.keys(processedValueSets).length === 0;
+    Object.keys(processedValueSets).length === 0 &&
+    Object.keys(candidateExpressions).length === 0;
 
   if (noExpressionsToBeUpdated) {
     return {
@@ -81,6 +86,10 @@ export async function evaluateOtherExpressions(
       processedValueSetsUpdate: {
         isUpdated: false,
         value: processedValueSets
+      },
+      candidateExpressionsUpdate: {
+        isUpdated: false,
+        value: candidateExpressions
       },
       computedQRItemUpdates: {}
     };
@@ -115,6 +124,15 @@ export async function evaluateOtherExpressions(
       updatedFhirPathContext,
       updatedFhirPathTerminologyCache,
       enableWhenExpressions,
+      terminologyServerUrl
+    );
+
+  // Update candidateExpressions
+  const { isUpdated: candidateExpressionsUpdated, updatedCandidateExpressions } =
+    await evaluateCandidateExpressions(
+      updatedFhirPathContext,
+      updatedFhirPathTerminologyCache,
+      candidateExpressions,
       terminologyServerUrl
     );
 
@@ -170,6 +188,10 @@ export async function evaluateOtherExpressions(
     processedValueSetsUpdate: {
       isUpdated: processedValueSetsUpdated,
       value: updatedProcessedValueSets
+    },
+    candidateExpressionsUpdate: {
+      isUpdated: candidateExpressionsUpdated,
+      value: updatedCandidateExpressions
     },
     computedQRItemUpdates
   };

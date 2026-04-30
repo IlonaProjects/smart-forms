@@ -1,0 +1,122 @@
+---
+sidebar_position: 6
+---
+
+import IframeContainer from '../../src/react/IframeContainer';
+
+# Candidate Expression
+
+Candidate expressions enable dynamic generation of answer options from FHIR data sources at runtime. This is useful for populating choice-type questions with patient-specific or context-dependent data such as active conditions, medications, or observations.
+
+The extension that falls under this category is:
+
+- [candidateExpression](http://hl7.org/fhir/uv/sdc/expressions.html#candidateExpression)
+
+:::note
+
+CandidateExpression is similar to answerExpression, but supports multiple expressions per item and works alongside [variables](http://hl7.org/fhir/uv/sdc/expressions.html#variable) and [launch context](http://hl7.org/fhir/uv/sdc/expressions.html#launchContext).
+
+:::
+
+Not all components support candidate expressions. Only the following components support this extension:
+
+| Components  |
+| ----------- |
+| choice      |
+| open-choice |
+
+### CandidateExpression
+
+Allows specifying a FHIRPath or x-fhir-query expression that resolves to a set of possible answers for a question. The expression is evaluated at runtime based on the current context.
+
+Supported expression languages:
+
+- **text/fhirpath** - FHIRPath expressions
+- **application/x-fhir-query** - FHIR REST API queries
+
+#### Basic usage
+
+<IframeContainer
+  storyId="smart-forms-3-0-0-alpha-sdc-behaviors-candidate-expressions--basic-candidate-expressions"
+  initialHeight={600}
+/>
+
+#### Multiple expressions usage
+
+<IframeContainer
+  storyId="smart-forms-3-0-0-alpha-sdc-behaviors-candidate-expressions--multiple-candidate-expressions"
+  initialHeight={300}
+/>
+
+#### FHIRPath with Variables example
+
+```json
+{
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "PatientConditions",
+        "language": "application/x-fhir-query",
+        "expression": "Condition?patient={{%patient.id}}&clinical-status=active"
+      }
+    }
+  ],
+  "item": [
+    {
+      "linkId": "condition-select",
+      "type": "choice",
+      "text": "Select a condition",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression",
+          "valueExpression": {
+            "language": "text/fhirpath",
+            "expression": "%PatientConditions.entry.resource.where(resourceType='Condition')"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### X-FHIR-Query example
+
+```json
+{
+  "linkId": "medication-select",
+  "type": "choice",
+  "text": "Current Medications",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression",
+      "valueExpression": {
+        "language": "application/x-fhir-query",
+        "expression": "MedicationRequest?patient={{%patient.id}}&status=active"
+      }
+    }
+  ]
+}
+```
+
+Variables in x-fhir-query expressions (e.g., `{{%patient.id}}`) are automatically substituted with values from the launch context or questionnaire variables.
+
+### Supported Resource Types
+
+The library automatically converts common FHIR resource types into answer options:
+
+**Clinical:** Condition, Observation, Procedure, DiagnosticReport, AllergyIntolerance  
+**Medication:** MedicationRequest, Medication, Immunization  
+**Administrative:** Patient, Practitioner, Organization, Location  
+**Other:** Encounter, Device, CarePlan, ServiceRequest, Specimen
+
+:::tip
+
+Use `_count` and `_sort` parameters in x-fhir-query expressions to limit and order results for better performance:
+
+```
+Condition?patient={{%patient.id}}&_count=20&_sort=-onset-date
+```
+
+:::

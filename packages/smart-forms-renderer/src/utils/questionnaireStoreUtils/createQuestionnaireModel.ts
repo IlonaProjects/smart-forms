@@ -80,6 +80,7 @@ export async function createQuestionnaireModel(
     calculatedExpressions,
     initialExpressions,
     answerExpressions,
+    candidateExpressions,
     answerOptions,
     answerOptionsToggleExpressions
   } = extractOtherExtensionsResult;
@@ -123,6 +124,7 @@ export async function createQuestionnaireModel(
     calculatedExpressions,
     initialExpressions,
     answerExpressions,
+    candidateExpressions,
     answerOptions: completeAnswerOptions,
     answerOptionsToggleExpressions: answerOptionsToggleExpressions,
     processedValueSets,
@@ -145,6 +147,7 @@ function createEmptyModel(): QuestionnaireModel {
     initialExpressions: {},
     enableWhenExpressions: { singleExpressions: {}, repeatExpressions: {} },
     answerExpressions: {},
+    candidateExpressions: {},
     answerOptions: {},
     answerOptionsToggleExpressions: {},
     enableWhenItems: { singleItems: {}, repeatItems: {} },

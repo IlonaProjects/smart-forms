@@ -57,6 +57,7 @@ jest.mock('../utils/getExpressionsFromItem', () => ({
   getAnswerExpression: jest.fn(),
   getAnswerOptionsToggleExpressions: jest.fn(),
   getCalculatedExpressions: jest.fn(),
+  getCandidateExpressions: jest.fn().mockReturnValue([]),
   getEnableWhenExpression: jest.fn(),
   getInitialExpression: jest.fn()
 }));
@@ -174,6 +175,7 @@ describe('extractOtherExtensions - Phase 5', () => {
         answerExpressions: {},
         answerOptions: {},
         answerOptionsToggleExpressions: {},
+        candidateExpressions: {},
         valueSetPromises: valueSetPromises,
         processedValueSets: processedValueSets,
         cachedValueSetCodings: cachedValueSetCodings
@@ -213,6 +215,7 @@ describe('extractOtherExtensions - Phase 5', () => {
         answerExpressions: {},
         answerOptions: {},
         answerOptionsToggleExpressions: {},
+        candidateExpressions: {},
         valueSetPromises: valueSetPromises,
         processedValueSets: processedValueSets,
         cachedValueSetCodings: cachedValueSetCodings
