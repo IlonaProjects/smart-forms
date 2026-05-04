@@ -35,6 +35,7 @@ import type {
   EnableWhenSingleLinkedItem
 } from '../../interfaces/enableWhen.interface';
 import type { AnswerExpression } from '../../interfaces/answerExpression.interface';
+import type { CandidateExpressions } from '../../interfaces/candidateExpression.interface';
 import type { ProcessedValueSet, ValueSetPromise } from '../../interfaces/valueSet.interface';
 import { getValueSetPromise } from '../valueSet';
 import type { Variables } from '../../interfaces/variables.interface';
@@ -47,6 +48,7 @@ import {
   getAnswerExpression,
   getAnswerOptionsToggleExpressions,
   getCalculatedExpressions,
+  getCandidateExpressions,
   getEnableWhenExpression,
   getInitialExpression
 } from '../getExpressionsFromItem';
@@ -63,6 +65,7 @@ interface ReturnParamsRecursive {
   calculatedExpressions: Record<string, CalculatedExpression[]>;
   initialExpressions: Record<string, InitialExpression>;
   answerExpressions: Record<string, AnswerExpression>;
+  candidateExpressions: CandidateExpressions;
   valueSetPromises: Record<string, ValueSetPromise>;
   processedValueSets: Record<string, ProcessedValueSet>;
   cachedValueSetCodings: Record<string, Coding[]>;
@@ -87,6 +90,7 @@ export async function extractOtherExtensions(
   const calculatedExpressions: Record<string, CalculatedExpression[]> = {};
   const initialExpressions: Record<string, InitialExpression> = {};
   const answerExpressions: Record<string, AnswerExpression> = {};
+  const candidateExpressions: CandidateExpressions = {};
   const answerOptions: Record<string, QuestionnaireItemAnswerOption[]> = {};
   const answerOptionsToggleExpressions: Record<string, AnswerOptionsToggleExpression[]> = {};
 
@@ -101,6 +105,7 @@ export async function extractOtherExtensions(
       calculatedExpressions: {},
       initialExpressions: {},
       answerExpressions: {},
+      candidateExpressions: {},
       answerOptions: {},
       answerOptionsToggleExpressions: {},
       valueSetPromises: valueSetPromises,
@@ -120,6 +125,7 @@ export async function extractOtherExtensions(
       calculatedExpressions,
       initialExpressions,
       answerExpressions,
+      candidateExpressions,
       answerOptions,
       answerOptionsToggleExpressions,
       valueSetPromises,
@@ -138,6 +144,7 @@ export async function extractOtherExtensions(
     calculatedExpressions,
     initialExpressions,
     answerExpressions,
+    candidateExpressions,
     answerOptions,
     answerOptionsToggleExpressions,
     valueSetPromises,
@@ -155,6 +162,7 @@ interface extractExtensionsFromItemRecursiveParams {
   calculatedExpressions: Record<string, CalculatedExpression[]>;
   initialExpressions: Record<string, InitialExpression>;
   answerExpressions: Record<string, AnswerExpression>;
+  candidateExpressions: CandidateExpressions;
   answerOptions: Record<string, QuestionnaireItemAnswerOption[]>;
   answerOptionsToggleExpressions: Record<string, AnswerOptionsToggleExpression[]>;
   valueSetPromises: Record<string, ValueSetPromise>;
@@ -177,6 +185,7 @@ async function extractExtensionsFromItemRecursive(
     calculatedExpressions,
     initialExpressions,
     answerExpressions,
+    candidateExpressions,
     answerOptions,
     answerOptionsToggleExpressions,
     valueSetPromises,
@@ -264,6 +273,12 @@ async function extractExtensionsFromItemRecursive(
     };
   }
 
+  // Get candidateExpressions
+  const candidateExpressionsOfItem = getCandidateExpressions(item);
+  if (candidateExpressionsOfItem.length > 0) {
+    candidateExpressions[item.linkId] = candidateExpressionsOfItem;
+  }
+
   // Get answerOptions
   const options = item.answerOption ?? null;
   if (options) {
@@ -335,6 +350,7 @@ async function extractExtensionsFromItemRecursive(
     calculatedExpressions,
     initialExpressions,
     answerExpressions,
+    candidateExpressions,
     answerOptions,
     answerOptionsToggleExpressions,
     valueSetPromises,

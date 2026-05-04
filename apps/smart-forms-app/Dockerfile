@@ -1,7 +1,7 @@
 # Dockerfile
 
 # Step 1: Use a Node.js image to build the app
-FROM --platform=$BUILDPLATFORM node:18 AS builder
+FROM --platform=$BUILDPLATFORM node:20 AS builder
 
 # Set working directory inside the container
 WORKDIR /app
@@ -23,8 +23,18 @@ COPY packages/sdc-template-extract/package*.json ./packages/sdc-template-extract
 COPY packages/smart-forms-renderer/package*.json ./packages/smart-forms-renderer/
 COPY apps/smart-forms-app/package*.json ./apps/smart-forms-app/
 
-# Install all workspace dependencies from the root
-RUN npm install
+# npm 10 on Node 20 still runs `prepare` scripts for local workspace packages even with --ignore-scripts,
+# because they are symlinked rather than downloaded. Strip prepare scripts from workspace package.json files
+# before install to prevent build attempts before source files are copied. Packages are built explicitly below.
+RUN node -e "\
+  ['packages/sdc-assemble','packages/sdc-populate','packages/sdc-template-extract','packages/smart-forms-renderer']\
+  .forEach(p => {\
+    const f = p + '/package.json';\
+    const pkg = JSON.parse(require('fs').readFileSync(f));\
+    delete pkg.scripts.prepare;\
+    require('fs').writeFileSync(f, JSON.stringify(pkg, null, 2));\
+  });"
+RUN npm install --ignore-scripts
 
 # Copy source files for all packages and the app
 COPY packages/sdc-assemble/ ./packages/sdc-assemble/

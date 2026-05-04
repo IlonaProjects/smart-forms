@@ -204,6 +204,19 @@ export function сqfExpressionFactory(text: string) {
   };
 }
 
+export function candidateExpressionExtFactory(
+  expression: string,
+  language: 'text/fhirpath' | 'application/x-fhir-query' = 'text/fhirpath'
+): Extension {
+  return {
+    url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-candidateExpression',
+    valueExpression: {
+      language: language,
+      expression: expression
+    }
+  };
+}
+
 export const ucumSystem = 'http://unitsofmeasure.org';
 
 /** Parses strings like `11:00 am` for MUI desktop time picker interactions */
@@ -240,7 +253,6 @@ async function setTimeViaMuiDesktopPicker(
 ) {
   const { hour12, minute, meridiem } = parse12hDisplayTime(displayTime);
   const minuteVal = parseInt(minute, 10);
-  // MUI enUS: hoursClockNumberText → "11 hours", minutesClockNumberText → "0 minutes"
   const hourOptionName = new RegExp(`^${hour12}\\s+hours$`, 'i');
   const minuteOptionName = new RegExp(`^${minuteVal}\\s+minutes$`, 'i');
 
@@ -267,7 +279,6 @@ async function setTimeViaMuiDesktopPicker(
       throw new Error('Expected multi-section time lists');
     }
 
-    // Match by aria-label anywhere in the clock (column order varies with RTL / MUI version).
     await clickMultiSectionClockOption(multiRoot, hourOptionName);
     await clickMultiSectionClockOption(multiRoot, minuteOptionName);
 

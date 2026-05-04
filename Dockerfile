@@ -13,8 +13,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY apps/smart-forms-app/package*.json ./apps/smart-forms-app/
 
-# Install dependencies
-RUN npm install
+# Install dependencies (--ignore-scripts skips the prepare hook which requires source files not yet copied)
+RUN npm install --ignore-scripts
 
 # Copy the rest of the app's source code
 COPY . .

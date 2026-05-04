@@ -123,7 +123,8 @@ describe('questionnaireStore', () => {
     cachedValueSetCodings: {},
     fhirPathContext: {},
     fhirPathTerminologyCache: {},
-    answerOptions: {}
+    answerOptions: {},
+    candidateExpressions: {}
   };
 
   const mockInitialiseFormResult = {
@@ -171,6 +172,10 @@ describe('questionnaireStore', () => {
         value: {}
       },
       processedValueSetsUpdate: {
+        isUpdated: false,
+        value: {}
+      },
+      candidateExpressionsUpdate: {
         isUpdated: false,
         value: {}
       },
